@@ -1,8 +1,8 @@
-#include <unordered_map>
-#include <map>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <vector>
+
 #include <iostream>
 using namespace std;
 
@@ -34,7 +34,7 @@ struct Point{
 	}
 };
 
-void load(string fname, map<int,Point> &points){
+void load(string fname, vector<pair<int,Point>> &points){
    fstream f;
    f.open(fname,ios::in);
    if(f.is_open()){
@@ -60,21 +60,21 @@ void load(string fname, map<int,Point> &points){
 		parse >> cord;
 		tmp.z = cord;
 		
-		points.insert(pair<int,Point>(c,tmp));//add the point and ints index to the map
+		points.push_back(pair<int,Point>(c,tmp));//add the point and ints index to the map
 		c++;
 	}
    }
 }
 
 
-int* radix(const map<int,Point> points,int dir){
+void radix(vector<pair<int,Point>> points,int dir){
 	
 }
 
-int verify(int** finalsort, const map<int,Point> points){
+int verify(int** finalsort, vector<pair<int,Point>> points){
 return NULL;
 }
-int** mkbins(const map<int,Point> points,int dir){
+int** mkbins(vector<pair<int,Point>> points,int dir){
 	radix(points,dir);
 }
 int** binmerge(int** X, int** Y, int** Z){
@@ -109,13 +109,14 @@ void print(int ** finalsort, int dist){
 int main(int argc, char* argv[]){
 	string filename = "Input.txt";
 	if(argc>1) filename = argv[1];
-	map<int,Point> points;
+
+	vector<pair<int,Point>> points;
 	load(filename,points);//load the points up
-	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[1].toString()<<endl;
+	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].second.toString()<<endl;
 	
-	int** Xbins = mkbins(points,0); //O(n)
-	int** Ybins = mkbins(points,1); //O(n)
-	int** Zbins = mkbins(points,2); //O(n)	
+	//int** Xbins = mkbins(points,0); //O(n)
+	//int** Ybins = mkbins(points,1); //O(n)
+	//int** Zbins = mkbins(points,2); //O(n)	
 	
 	//int** finalsort = binmerge(Xbins,Ybins,Zbins);
 
