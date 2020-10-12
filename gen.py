@@ -7,10 +7,12 @@ for i in range(n):
     points[random.randint(0,1000)] = tmp
 
 
+keys = list(points)
+keys = sorted(keys)
 with open("Input.txt",'w') as f:
     print(len(points),file=f)
     print(random.randint(2,10),file=f)
 
-    for value in points:
+    for value in keys:
         print(value,points[value][0],points[value][1],file=f)
 
