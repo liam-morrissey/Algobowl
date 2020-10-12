@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include<algorithm>
 
 #include <iostream>
 using namespace std;
@@ -22,19 +23,22 @@ struct Point{
 		return tmp;
 	}
 	int get(int val){
+		
 		if (val ==0){
 			return this->x;
 		}
-		if (val ==1){
+		
+		if (val == 1){
 			return this->y;
 		}
+
 		if (val == 2){
 			return this->z;
 		}
 	}
 };
 
-void load(string fname, vector<pair<int,Point>> &points){
+void load(string fname, vector<Point> &points){
    fstream f;
    f.open(fname,ios::in);
    if(f.is_open()){
@@ -59,27 +63,58 @@ void load(string fname, vector<pair<int,Point>> &points){
 		
 		parse >> cord;
 		tmp.z = cord;
-		
-		points.push_back(pair<int,Point>(c,tmp));//add the point and ints index to the map
+		tmp.index = c;
+		points.push_back(tmp);//add the point and ints index to the map
 		c++;
 	}
    }
 }
 
 
-void radix(vector<pair<int,Point>> points,int dir){
-	
+
+
+bool xComp(const Point & a, const Point& b) {
+   return a.x < b.x;
+}
+bool yComp(const Point & a, const Point& b) {
+   return a.y < b.y;
+}
+bool zComp(const Point & a, const Point& b) {
+   return a.z < b.z;
 }
 
-int verify(int** finalsort, vector<pair<int,Point>> points){
+
+
+int verify(int** finalsort, vector<Point> points){
 return NULL;
 }
-int** mkbins(vector<pair<int,Point>> points,int dir){
-	radix(points,dir);
+
+int* mkbins(const vector<Point> points,int dir){
+	vector<Point> tmp = points;
+	if(dir== 0){
+		sort(tmp.begin(),tmp.end(),&xComp);
+	}
+	if(dir== 1){
+		sort(tmp.begin(),tmp.end(),&yComp);
+	}
+	if(dir== 2){
+		sort(tmp.begin(),tmp.end(),&zComp);
+	}
+	
+	int* arr = new int[1000];//intilize an array
+	
+	int c =0;
+	for(auto it = tmp.begin(); it !=tmp.end(); it++){
+		arr[c] = it->index;
+		c++;
+	}
+	arr[n] = 0;//the null of the array
+	return arr;	
 }
+
+
 int** binmerge(int** X, int** Y, int** Z){
 return NULL;
-
 }
 
 void print(int ** finalsort, int dist){
@@ -110,13 +145,15 @@ int main(int argc, char* argv[]){
 	string filename = "Input.txt";
 	if(argc>1) filename = argv[1];
 
-	vector<pair<int,Point>> points;
+	vector<Point> points;
 	load(filename,points);//load the points up
-	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].second.toString()<<endl;
+	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 	
-	//int** Xbins = mkbins(points,0); //O(n)
-	//int** Ybins = mkbins(points,1); //O(n)
-	//int** Zbins = mkbins(points,2); //O(n)	
+	int *Xbins = mkbins(points,0);
+		
+	int* Ybins = mkbins(points,1); //O(nlogn) uses quick sort
+
+	int* Zbins = mkbins(points,2); //O(nlogn)
 	
 	//int** finalsort = binmerge(Xbins,Ybins,Zbins);
 
