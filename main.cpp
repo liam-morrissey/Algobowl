@@ -83,38 +83,68 @@ bool zComp(const Point & a, const Point& b) {
    return a.z < b.z;
 }
 
-
-
-int verify(int** finalsort, vector<Point> points){
-return NULL;
+void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
+   for(Point i: initial){
+   switch(dim){
+   	case 0: if(i.x>rangedavg) {
+			split.push_back(i);
+			initial.erase(i);
+		}
+	case 1: if(i.y>rangedavg) {
+			split.push_back(i);
+			initial.erase(i);
+		}
+	case 2: if(i.z>rangedavg) {
+			split.push_back(i);
+			initial.erase(i);
+		}
+   }
+   }
 }
 
-int* mkbins(const vector<Point> points,int dir){
-	vector<Point> tmp = points;
+
+int verify(vector<vector<Point>> sectors){
+	int maxDist=0;
+	for(x : sectors){
+		for(int i = 0; i<x.size()-1; i++){
+			for(int j = i+1; j<x.size(); j++){
+				dist = distance(x.at(i),x.at(j);
+				if (dist>maxDist) maxDist = dist;
+			}
+		}
+	}
+}
+
+void sortbins( vector<Point> &points,int dir){
+	
 	if(dir== 0){
-		sort(tmp.begin(),tmp.end(),&xComp);
+		sort(points.begin(),points.end(),&xComp);
 	}
 	if(dir== 1){
-		sort(tmp.begin(),tmp.end(),&yComp);
+		sort(points.begin(),points.end(),&yComp);
 	}
 	if(dir== 2){
-		sort(tmp.begin(),tmp.end(),&zComp);
+		sort(points.begin(),points.end(),&zComp);
 	}
-	
-	int* arr = new int[1000];//intilize an array
-	
-	int c =0;
-	for(auto it = tmp.begin(); it !=tmp.end(); it++){
-		arr[c] = it->index;
-		c++;
-	}
-	arr[n] = 0;//the null of the array
-	return arr;	
 }
 
 
-int** binmerge(int** X, int** Y, int** Z){
-return NULL;
+vector<vector<Point>> binmerge(vector<Point> p){
+	vector<vector<Point>> sectors;
+	sectors.push_back(p);
+	int largestSector=0;
+	for(int i =0; i<k; i++){//do this until k sectors
+
+		for(int j=0; j<sectors.size(); j++){
+		if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
+		}
+		sortbins(sectors.at(largestSector), i%3);
+		vector<Point> temp;
+		int avg = (sectors.at(largestSector).front()+sectors.at(largestSector).back())/2;
+		split(avg, i%3, sectors.at(largestSector), temp);
+		sectors.push_back(temp);
+	}
+	return sectors;
 }
 
 void print(int ** finalsort, int dist){
