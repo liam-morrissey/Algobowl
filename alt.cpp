@@ -54,7 +54,12 @@ struct cluster{
 		findMiddle();
 	}
 	int compareTo(cluster c){
-		return distance(this->middle, c.middle);
+		int max =0;
+		for(Point p: this->points){
+			for(Point q: c.points)
+				if(max< distance(p,q)) max = distance(p,q);
+		}
+		return max;
 	}
 	void findMiddle(){
 		int x=0;
