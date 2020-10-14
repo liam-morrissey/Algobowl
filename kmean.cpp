@@ -75,6 +75,7 @@ struct cluster{
 			z+=it.get(2);
 		}
 		int size = this->points.size();
+		
 		middle = Point(x/size,y/size,z/size);
 		cout<<"FINDMIDDLE: "<<middle.toString()<<endl;
 		return middle;
@@ -309,6 +310,7 @@ int main(int argc, char* argv[]){
         for( string filename : filenames){
 		vector<Point> points;
 		load(filename,points);//load the points up
+		cout<<"FILE: "<<filename<<endl;
 		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 		vector<cluster> clusters = createClusters(points);
 		cout<<"Exited Clusters"<<endl;	
