@@ -90,8 +90,8 @@ int distance(const Point & a, const Point & b){
 void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
 	int c=1;
    for( int i= 0; i< initial.size(); i++ ){
-	  auto it = initial.begin()+i;
-	   cout<<"Size: "<<to_string(initial.size())<<" COUNT: "<<to_string(c)<<endl;
+	 	auto it = initial.begin()+i;
+
  	 if(it->get(dim)>rangedavg) {
 			split.push_back(*it);
 
@@ -144,7 +144,6 @@ vector<vector<Point>> binmerge(vector<Point> p){
 	for(int i =0; i<k; i++){//do this until k sectors
 
 		for(int j=0; j<sectors.size(); j++){
-			cout<<"J IS: "<<to_string(j)<<endl;
 			if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
 		}
 		sortbins(sectors.at(largestSector), i%3);
@@ -186,7 +185,6 @@ int main(int argc, char* argv[]){
 	load(filename,points);//load the points up
 	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 	vector<vector<Point>> bins = binmerge(points);		
-	cout<<"Reached Here"<<endl;
 
 	int dist = verify(bins);
 	print(bins,dist);
