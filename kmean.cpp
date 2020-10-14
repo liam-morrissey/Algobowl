@@ -6,6 +6,7 @@
 #include<cmath>
 #include <iostream>
 #include<cmath>
+
 using namespace std;
 
 int n,k;//global Variables
@@ -261,10 +262,24 @@ void print(vector<cluster> clusters, int dist, string filename){
 vector<cluster> createClusters(vector<Point> p){
 	srand(time(nullptr));
 	//create inital nodes
+	vector<Point> set;
+	while(set.size()<k){
+		Point temp = p.at(rand()%p.size());
+		bool flag = false;
+		for(Point pnt: set){
+		if(pnt.equals(temp)) {
+			flag = true;
+			break;
+		}
+		}
+		if(flag) continue;
+
+		set.push_back(temp);
+	}
 	vector<cluster> clusters;
 	int base = rand();
-	for(int i =0; i<k; i++){
-		clusters.push_back(cluster(p.at((base+i)%p.size())));//creates k clusters
+	for(Point pnt : set){
+		clusters.push_back(cluster(pnt));//creates k clusters
 	}
 	int clusterchange = 1;
 	int counter = 0;
