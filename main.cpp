@@ -28,11 +28,11 @@ struct Point{
 			return this->x;
 		}
 		
-		if (val == 1){
+		else if (val == 1){
 			return this->y;
 		}
 
-		if (val == 2){
+		else{
 			return this->z;
 		}
 	}
@@ -88,12 +88,22 @@ int distance(const Point & a, const Point & b){
 }
 
 void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
-   for( auto i= initial.begin(); i!= initial.end(); i++ ){
- 	 if(i->get(dim)>rangedavg) {
-			split.push_back(*i);
-			initial.erase(i);
+	int c=1;
+   for( int i= 0; i< initial.size(); i++ ){
+	  auto it = initial.begin()+i;
+	   cout<<"Size: "<<to_string(initial.size())<<" COUNT: "<<to_string(c)<<endl;
+ 	 if(it->get(dim)>rangedavg) {
+			split.push_back(*it);
+
+			//auto deleteMe = i;
+			//i++;
+
+			
+			initial.erase(it);
+			i--;
 		}
 
+   	c++;
    }
    }
 
@@ -110,6 +120,7 @@ int verify(vector<vector<Point>> sectors){
 			}
 		}
 	}
+	return maxDist;
 }
 
 void sortbins( vector<Point> &points,int dir){
@@ -133,6 +144,7 @@ vector<vector<Point>> binmerge(vector<Point> p){
 	for(int i =0; i<k; i++){//do this until k sectors
 
 		for(int j=0; j<sectors.size(); j++){
+			cout<<"J IS: "<<to_string(j)<<endl;
 			if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
 		}
 		sortbins(sectors.at(largestSector), i%3);
@@ -144,21 +156,19 @@ vector<vector<Point>> binmerge(vector<Point> p){
 	return sectors;
 }
 
-void print(int ** finalsort, int dist){
+void print(vector<vector<Point>> points, int dist){
    fstream f;
    f.open("output.txt",ios::out);
    if(f.is_open()){
 	f << to_string(dist)<< '\n';	
-	for(int i = 0; i < 2; i ++){
-		int *p = finalsort[i];//pointer to an array
-		for(int j =0; j < n-k; j++){
-			int tmp = p[j];//the value
-			//cout<<"Tmp is: "<<tmp<<endl;
-			f<<to_string(tmp);
-			if(p[j+1] == 0){//the next value is 0, that means we have reached the end for this array
-				break;
+	for(auto it = points.begin(); it != points.end(); it++){
+
+		for(auto itt = it->begin(); itt != it->end(); itt++ ){
+			f<<to_string(itt->index);
+			auto tmp = (itt+1);
+			if(tmp != it->end()){//the next is not the end
+				f<<' ';
 			}
-			f<<' ';
 		}
 		f<<'\n';
 
@@ -175,17 +185,10 @@ int main(int argc, char* argv[]){
 	vector<Point> points;
 	load(filename,points);//load the points up
 	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
-	vector<vector<Point>> bins = binmerge(points);	
+	vector<vector<Point>> bins = binmerge(points);		
+	cout<<"Reached Here"<<endl;
 
-	//int *Xbins = mkbins(points,0);
-		
-	//int* Ybins = mkbins(points,1); //O(nlogn) uses quick sort
-
-	//int* Zbins = mkbins(points,2); //O(nlogn)
-	
-	//int** finalsort = binmerge(Xbins,Ybins,Zbins);
-
-	//int dist = verify(finalsort);
-	//print(finalsort,dist);
+	int dist = verify(bins);
+	print(bins,dist);
 	return 0;
 }
