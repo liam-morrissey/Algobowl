@@ -77,7 +77,6 @@ struct cluster{
 			z+=it.get(2);
 		}
 		int size = this->points.size();
-		cout<<"SIZE: "<<size<<endl;
 		Point avg = Point(x/size,y/size,z/size);
 		int closest = 6001;
 		Point temp;
@@ -88,7 +87,6 @@ struct cluster{
 			}
 		}
 		middle = temp;
-		cout<<"FINDMIDDLE: "<<middle.toString()<<endl;
 		return middle;
 	}
 
@@ -171,7 +169,6 @@ int verify(vector<cluster> sectors){
 	int count=1;
 	for(cluster x : sectors){
 		int interDist = 0;
-		cout<<"SECTOR: "<<count<<endl;
 		for(int i = 0; i<x.points.size()-1; i++){
 			for(int j = i+1; j<x.points.size(); j++){
 				int dist = distance(x.points.at(i),x.points.at(j));
@@ -179,7 +176,6 @@ int verify(vector<cluster> sectors){
 				if (dist>interDist) interDist =dist;
 			}
 		}
-		cout<<"MEDIAT DIST: "<<interDist<<endl<<endl;
 		count++;
 	}
 	return maxDist;
@@ -190,7 +186,6 @@ int verify(vector<vector<Point>> sectors){
 	int count=1;
 	for(vector<Point> x : sectors){
 		int interDist = 0;
-		cout<<"SECTOR: "<<count<<endl;
 		for(int i = 0; i<x.size()-1; i++){
 			for(int j = i+1; j<x.size(); j++){
 				int dist = distance(x.at(i),x.at(j));
@@ -198,7 +193,6 @@ int verify(vector<vector<Point>> sectors){
 				if (dist>interDist) interDist =dist;
 			}
 		}
-		cout<<"MEDIAT DIST: "<<interDist<<endl<<endl;
 		count++;
 	}
 	return maxDist;
@@ -284,7 +278,6 @@ vector<cluster> createClusters(vector<Point> p){
 	int clusterchange = 1;
 	int counter = 0;
 	while(clusterchange>0){
-		cout<<counter<<endl;
 		clusterchange = 0;//clusterchange set to one
 		for(int i = 0; i<p.size(); i++){ //groups point to nearest centroid 
 			int smallestdist = 6001;
@@ -299,25 +292,19 @@ vector<cluster> createClusters(vector<Point> p){
 			clusters.at(closestcluster).points.push_back(p.at(i));	// for each point, add it to closest cluster		
 		}
 		for(Point p: clusters.at(0).points){
-		//	cout<<p.toString()<<endl;
 		}
 		for(int i = 0; i<k; i++){
-			//cout<<it.middle.toString()<<endl;
 			Point temp = clusters.at(i).middle;
-			//cout<<"1_ MID: "<<temp.toString()<<" 2_MID: "<<it.middle.toString()<<endl;
 			if(!temp.equals(clusters.at(i).findMiddle())) clusterchange++; //if the centroid changed, add to cluster change
 		}
 		//if there was a change in the middle (new points added), delete the vector of points
 		if(clusterchange != 0){
-			cout<<"ortho change"<<endl;
 			for(auto it= clusters.begin(); it!= clusters.end(); it++){
-				//cout<<it.middle.toString();
 				it->points.clear(); 
 			}
 			
 		}
 		
-		cout<<endl;
 	}
 return clusters;
 }
@@ -325,14 +312,18 @@ return clusters;
 
 int main(int argc, char* argv[]){
 	vector<string> filenames;
+	int thresh;
 	if(argc>1){
-                for(int i=1; i<argc; i++){
+		thresh = stoi(argv[1]);
+                for(int i=2; i<argc; i++){
                         filenames.push_back(argv[i]);
                 }
         }
         else{//defualt input
         filenames.push_back("Input.txt");
+	thresh = 2000;
         }
+	
 
         for( string filename : filenames){
 		vector<Point> points;
@@ -341,9 +332,8 @@ int main(int argc, char* argv[]){
 		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 		vector<cluster> bestcluster;
 		int smallestdist =6001;
-		for(int i =0; i<100000; i++){
+		while(smallestdist>thresh){
 		vector<cluster> clusters = createClusters(points);
-		cout<<"Exited Clusters"<<endl;	
 		int dist = verify(clusters);
 		if(dist<smallestdist){
 			smallestdist = dist;
