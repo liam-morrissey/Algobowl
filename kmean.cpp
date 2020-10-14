@@ -76,7 +76,16 @@ struct cluster{
 		}
 		int size = this->points.size();
 		
-		middle = Point(x/size,y/size,z/size);
+		Point avg = Point(x/size,y/size,z/size);
+		int closest = 6001;
+		Point temp;
+		for(Point p : points){
+			if(distance(p, avg)<closest){
+			closest = distance(p,avg);
+			temp = p;
+			}
+		}
+		middle = temp;
 		cout<<"FINDMIDDLE: "<<middle.toString()<<endl;
 		return middle;
 	}
