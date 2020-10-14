@@ -9,10 +9,6 @@ using namespace std;
 
 int n,k;//global Variables
 
-
-
-
-
 struct Point{
 	int x,y,z;
 	int index;
@@ -232,7 +228,7 @@ vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 
 void print(vector<cluster> clusters, int dist, string filename){
    fstream f;
-   f.open(filename.substr(0,filename.find(".txt"))+"_aout.txt",ios::out);
+   f.open(filename.substr(0,filename.find(".txt"))+"_kout.txt",ios::out);
    if(f.is_open()){
 	f << to_string(dist)<< '\n';	
 	for(cluster it : clusters ){
