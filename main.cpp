@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 #include<algorithm>
-
+#include<cmath>
 #include <iostream>
 using namespace std;
 
@@ -83,32 +83,29 @@ bool zComp(const Point & a, const Point& b) {
    return a.z < b.z;
 }
 
-void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
-   for(Point i: initial){
-   switch(dim){
-   	case 0: if(i.x>rangedavg) {
-			split.push_back(i);
-			initial.erase(i);
-		}
-	case 1: if(i.y>rangedavg) {
-			split.push_back(i);
-			initial.erase(i);
-		}
-	case 2: if(i.z>rangedavg) {
-			split.push_back(i);
-			initial.erase(i);
-		}
-   }
-   }
+int distance(const Point & a, const Point & b){
+	return abs(a.x - b.x) + abs(a.y-b.y) + abs(a.z-b.z);
 }
+
+void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
+   for( auto i= initial.begin(); i!= initial.end(); i++ ){
+ 	 if(i->get(dim)>rangedavg) {
+			split.push_back(*i);
+			initial.erase(i);
+		}
+
+   }
+   }
+
+
 
 
 int verify(vector<vector<Point>> sectors){
 	int maxDist=0;
-	for(x : sectors){
+	for(vector<Point> x : sectors){
 		for(int i = 0; i<x.size()-1; i++){
 			for(int j = i+1; j<x.size(); j++){
-				dist = distance(x.at(i),x.at(j);
+				int dist = distance(x.at(i),x.at(j));
 				if (dist>maxDist) maxDist = dist;
 			}
 		}
@@ -136,11 +133,11 @@ vector<vector<Point>> binmerge(vector<Point> p){
 	for(int i =0; i<k; i++){//do this until k sectors
 
 		for(int j=0; j<sectors.size(); j++){
-		if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
+			if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
 		}
 		sortbins(sectors.at(largestSector), i%3);
 		vector<Point> temp;
-		int avg = (sectors.at(largestSector).front()+sectors.at(largestSector).back())/2;
+		int avg = (sectors.at(largestSector).front().get(i%3)+sectors.at(largestSector).back().get(i%3))/2; // get the range avg for dim
 		split(avg, i%3, sectors.at(largestSector), temp);
 		sectors.push_back(temp);
 	}
@@ -178,12 +175,13 @@ int main(int argc, char* argv[]){
 	vector<Point> points;
 	load(filename,points);//load the points up
 	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
-	
-	int *Xbins = mkbins(points,0);
-		
-	int* Ybins = mkbins(points,1); //O(nlogn) uses quick sort
+	vector<vector<Point>> bins = binmerge(points);	
 
-	int* Zbins = mkbins(points,2); //O(nlogn)
+	//int *Xbins = mkbins(points,0);
+		
+	//int* Ybins = mkbins(points,1); //O(nlogn) uses quick sort
+
+	//int* Zbins = mkbins(points,2); //O(nlogn)
 	
 	//int** finalsort = binmerge(Xbins,Ybins,Zbins);
 
