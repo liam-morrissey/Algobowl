@@ -3,3 +3,5 @@
 output.txt
 *.swp
 alt.cpp
+inputs/
+

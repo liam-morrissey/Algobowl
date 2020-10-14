@@ -115,7 +115,6 @@ int verify(vector<vector<Point>> sectors){
 	int count=1;
 	for(vector<Point> x : sectors){
 		int interDist = 0;
-		cout<<"SECTOR: "<<count<<endl;
 		for(int i = 0; i<x.size()-1; i++){
 			for(int j = i+1; j<x.size(); j++){
 				int dist = distance(x.at(i),x.at(j));
@@ -123,7 +122,6 @@ int verify(vector<vector<Point>> sectors){
 				if (dist>interDist) interDist =dist;
 			}
 		}
-		cout<<"MEDIAT DIST: "<<interDist<<endl<<endl;
 		count++;
 	}
 	return maxDist;
@@ -163,9 +161,10 @@ vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 	return sectors;
 }
 
-void print(vector<vector<Point>> points, int dist){
+void print(vector<vector<Point>> points, int dist,string filename){
    fstream f;
-   f.open("output.txt",ios::out);
+
+   f.open(filename.substr(0,filename.find(".txt"))+"_out.txt",ios::out);
    if(f.is_open()){
 	f << to_string(dist)<< '\n';	
 	for(auto it = points.begin(); it != points.end(); it++){
@@ -186,26 +185,38 @@ void print(vector<vector<Point>> points, int dist){
 
 
 int main(int argc, char* argv[]){
-	string filename = "Input.txt";
-	if(argc>1) filename = argv[1];
-
-	vector<Point> points;
-	load(filename,points);//load the points up
-	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
-	vector<vector<Point>> bestbin;
-	int smalldist = 6001;
-	for(int i = 0; i<3; i++){
-		for(int j = 1; j<3;j++){
-		vector<vector<Point>> bins = binmerge(points,i,j);
-		int dist = verify(bins);
-		if(dist<smalldist){
-			smalldist = dist;
-			bestbin = bins;
-		}	
+	vector<string> filenames;
+	if(argc>1){
+		for(int i=1; i<argc; i++){
+			filenames.push_back(argv[i]);
 		}
 	}
+	else{//defualt input
+       	filenames.push_back("Input.txt");
+	}
+	
+	for( string filename : filenames){
+		cout<<"Working with: "<<filename<<endl;
+		vector<Point> points;
+		load(filename,points);//load the points up
+		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
+		vector<vector<Point>> bestbin;
+		int smalldist = 6001;
+		for(int i = 0; i<3; i++){
+			for(int j = 1; j<3;j++){
+				vector<vector<Point>> bins = binmerge(points,i,j);
+				int dist = verify(bins);
+				if(dist<smalldist){
+					smalldist = dist;
+					bestbin = bins;
+				}	
+			}
+		}
 	
 	
-	print(bestbin,smalldist);
+		print(bestbin,smalldist,filename);
+		cout<<endl;
+	}
+
 	return 0;
 }
