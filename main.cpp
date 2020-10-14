@@ -112,13 +112,19 @@ void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split)
 
 int verify(vector<vector<Point>> sectors){
 	int maxDist=0;
+	int count=1;
 	for(vector<Point> x : sectors){
+		int interDist = 0;
+		cout<<"SECTOR: "<<count<<endl;
 		for(int i = 0; i<x.size()-1; i++){
 			for(int j = i+1; j<x.size(); j++){
 				int dist = distance(x.at(i),x.at(j));
 				if (dist>maxDist) maxDist = dist;
+				if (dist>interDist) interDist =dist;
 			}
 		}
+		cout<<"MEDIAT DIST: "<<interDist<<endl<<endl;
+		count++;
 	}
 	return maxDist;
 }
@@ -137,19 +143,21 @@ void sortbins( vector<Point> &points,int dir){
 }
 
 
-vector<vector<Point>> binmerge(vector<Point> p){
+vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 	vector<vector<Point>> sectors;
 	sectors.push_back(p);
 	int largestSector=0;
-	for(int i =0; i<k; i++){//do this until k sectors
+	for(int i =0; sectors.size()<k; i++){//do this until k sectors
 
 		for(int j=0; j<sectors.size(); j++){
 			if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
 		}
-		sortbins(sectors.at(largestSector), i%3);
+		int dim = (start+mult*i)%3;
+		sortbins(sectors.at(largestSector), dim);
 		vector<Point> temp;
-		int avg = (sectors.at(largestSector).front().get(i%3)+sectors.at(largestSector).back().get(i%3))/2; // get the range avg for dim
-		split(avg, i%3, sectors.at(largestSector), temp);
+		int avg = (sectors.at(largestSector).front().get(dim)+sectors.at(largestSector).back().get(dim))/2; // get the range avg for dim
+		split(avg, dim, sectors.at(largestSector), temp);
+		if(temp.size()>0)
 		sectors.push_back(temp);
 	}
 	return sectors;
@@ -184,9 +192,20 @@ int main(int argc, char* argv[]){
 	vector<Point> points;
 	load(filename,points);//load the points up
 	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
-	vector<vector<Point>> bins = binmerge(points);		
-
-	int dist = verify(bins);
-	print(bins,dist);
+	vector<vector<Point>> bestbin;
+	int smalldist = 6001;
+	for(int i = 0; i<3; i++){
+		for(int j = 1; j<3;j++){
+		vector<vector<Point>> bins = binmerge(points,i,j);
+		int dist = verify(bins);
+		if(dist<smalldist){
+			smalldist = dist;
+			bestbin = bins;
+		}	
+		}
+	}
+	
+	
+	print(bestbin,smalldist);
 	return 0;
 }
