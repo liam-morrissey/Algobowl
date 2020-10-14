@@ -5,6 +5,7 @@
 #include<algorithm>
 #include<cmath>
 #include <iostream>
+#include<cmath>
 using namespace std;
 
 int n,k;//global Variables
@@ -75,7 +76,7 @@ struct cluster{
 			z+=it.get(2);
 		}
 		int size = this->points.size();
-		
+		cout<<"SIZE: "<<size<<endl;
 		Point avg = Point(x/size,y/size,z/size);
 		int closest = 6001;
 		Point temp;
@@ -258,10 +259,12 @@ void print(vector<cluster> clusters, int dist, string filename){
 }
 
 vector<cluster> createClusters(vector<Point> p){
+	srand(time(nullptr));
 	//create inital nodes
 	vector<cluster> clusters;
+	int base = rand();
 	for(int i =0; i<k; i++){
-		clusters.push_back(cluster(p.at(i)));//creates k clusters
+		clusters.push_back(cluster(p.at((base+i)%p.size())));//creates k clusters
 	}
 	int clusterchange = 1;
 	int counter = 0;
@@ -321,10 +324,18 @@ int main(int argc, char* argv[]){
 		load(filename,points);//load the points up
 		cout<<"FILE: "<<filename<<endl;
 		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
+		vector<cluster> bestcluster;
+		int smallestdist =6001;
+		for(int i =0; i<100000; i++){
 		vector<cluster> clusters = createClusters(points);
 		cout<<"Exited Clusters"<<endl;	
-		int smalldist = verify(clusters);
-		print(clusters,smalldist,filename);
+		int dist = verify(clusters);
+		if(dist<smallestdist){
+			smallestdist = dist;
+			bestcluster = clusters;
+		}
+		}
+		print(bestcluster,smallestdist,filename);
 	}
 	return 0;
 }
