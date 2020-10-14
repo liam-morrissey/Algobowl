@@ -215,9 +215,9 @@ vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 	return sectors;
 }
 
-void print(vector<cluster> clusters, int dist){
+void print(vector<cluster> clusters, int dist, string filename){
    fstream f;
-   f.open("c_output.txt",ios::out);
+   f.open(filename.substr(0,filename.find(".txt"))+"_aout.txt",ios::out);
    if(f.is_open()){
 	f << to_string(dist)<< '\n';	
 	for(cluster it : clusters ){
@@ -255,32 +255,29 @@ vector<cluster> createClusters(vector<Point> p){
 		clusters.at(i_j.first).combine(clusters.at(i_j.second));
 		clusters.erase(clusters.begin()+i_j.second);
 	}
+return clusters;
 }
 
 
 int main(int argc, char* argv[]){
-	string filename = "Input.txt";
-	if(argc>1) filename = argv[1];
+	vector<string> filenames;
+	if(argc>1){
+                for(int i=1; i<argc; i++){
+                        filenames.push_back(argv[i]);
+                }
+        }
+        else{//defualt input
+        filenames.push_back("Input.txt");
+        }
 
-	vector<Point> points;
-	load(filename,points);//load the points up
-	cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
-	vector<cluster> clusters = createClusters(points);
-	/*
-	vector<vector<Point>> bestbin;
-	int smalldist = 6001;
-	for(int i = 0; i<3; i++){
-		for(int j = 1; j<3;j++){
-		vector<vector<Point>> bins = binmerge(points,i,j);
-		int dist = verify(bins);
-		if(dist<smalldist){
-			smalldist = dist;
-			bestbin = bins;
-		}	
-		}
+        for( string filename : filenames){
+		vector<Point> points;
+		load(filename,points);//load the points up
+		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
+		vector<cluster> clusters = createClusters(points);
+		cout<<"Exited Clusters"<<endl;	
+		int smalldist = verify(clusters);
+		print(clusters,smalldist,filename);
 	}
-	*/
-	int smalldist = verify(clusters);
-	print(clusters,smalldist);
 	return 0;
 }
