@@ -254,7 +254,7 @@ void print(vector<cluster> clusters, int dist, string filename){
 }
 
 vector<cluster> createClusters(vector<Point> p){
-	srand(time(nullptr));
+	srand(time(0));
 	//create inital nodes
 	vector<Point> set;
 	while(set.size()<k){
@@ -332,6 +332,7 @@ int main(int argc, char* argv[]){
 		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 		vector<cluster> bestcluster;
 		int smallestdist =6001;
+		cout<<"Looking to beat: "<<thresh<<endl;
 		while(smallestdist>thresh){
 		vector<cluster> clusters = createClusters(points);
 		int dist = verify(clusters);
