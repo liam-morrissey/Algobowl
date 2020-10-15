@@ -40,7 +40,6 @@ struct Point{
 };
 
 void load(string fname, vector<Point> &points){
-   points.clear();
    fstream f;
    f.open(fname,ios::in);
    if(f.is_open()){
@@ -192,46 +191,42 @@ int dist;
    f.open(output,ios::in);
    if(f.is_open()){
 	string line;
-	
 	getline(f,line);
 	dist = stoi(line);//get n
 	vector<vector<Point>> bins;
 	vector<Point> temp;
 	while(getline(f,line)){
-		
 		stringstream parse(line);
 		while(!parse.eof()){
 		Point tmp;
 	       	int id;
 		parse >> id;
+		if(id>n) return false;
 		temp.push_back(points.at(id-1));
 		}
 		bins.push_back(temp);
-		temp.clear()
+		temp.clear();
 	}
-	return verify(bins);
+	return dist == verify(bins);
    }
    return false;
 }
 
 int main(int argc, char* argv[]){
-	vector<string> filenames; 
+	string inputfilename = "inputs/input_group217.txt"; 
+	vector<string> outputfilenames;
         if(argc>1){ 
-                for(int i=1; i<argc; i++){ 
-                        filenames.push_back(argv[i]); 
+                for(int i=1; i<argc; i++){
+		outputfilenames.push_back(argv[i]);
                 } 
         } 
-        else{//defualt input 
-        filenames.push_back("Input.txt");
-       	filenames.push_back("Output.txt");	
-        }
-	vector<Point> points;
-	for(int i = 1; i<=filenames.size()/2; i++){
+        vector<Point> points;
+	load(inputfilename, points);
+	for(int i = 0; i<outputfilenames.size(); i++){
 	//First, open up the input file
-	load(filenames.at(i-1), points);
 	//second, load teams best dist and bins
-	bool valid = verifyBin(filenames.at(i*2-1), points);
-	string temp = filenames.at(i-1);
+	bool valid = verifyBin(outputfilenames.at(i), points);
+	string temp = outputfilenames.at(i);
 	cout<<"Team "<<temp.substr(temp.find("2"), 3)<<" "<<valid<<endl;
 	}
 
