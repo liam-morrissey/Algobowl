@@ -50,6 +50,29 @@ int distance(const Point & a, const Point & b){
 	return abs(a.x - b.x) + abs(a.y-b.y) + abs(a.z-b.z);
 }
 
+bool xComp(const Point & a, const Point& b) {
+   return a.x < b.x;
+}
+bool yComp(const Point & a, const Point& b) {
+   return a.y < b.y;
+}
+bool zComp(const Point & a, const Point& b) {
+   return a.z < b.z;
+}
+
+void sortbins( vector<Point> &points,int dir){
+	
+	if(dir== 0){
+		sort(points.begin(),points.end(),&xComp);
+	}
+	if(dir== 1){
+		sort(points.begin(),points.end(),&yComp);
+	}
+	if(dir== 2){
+		sort(points.begin(),points.end(),&zComp);
+	}
+}
+
 struct cluster{
 	vector<Point> points;
 	Point middle;
@@ -68,6 +91,15 @@ struct cluster{
 		return distance(p, middle);
 	}
 	Point findMiddle(){
+		int x,y,z;
+
+		sortbins(points, 0);
+		x = points.at(points.size()/2).get(0);
+		sortbins(points, 1);
+		y = points.at(points.size()/2).get(1);
+		sortbins(points, 2);
+		z = points.at(points.size()/2).get(2);
+		/*
 		int x=0;
 		int y=0;
 		int z=0;
@@ -77,17 +109,19 @@ struct cluster{
 			z+=it.get(2);
 		}
 		int size = this->points.size();
-		Point avg = Point(x/size,y/size,z/size);
+		*/
+		Point med = Point(x,y,z);
 		int closest = 6001;
 		Point temp;
 		for(Point p : points){
-			if(distance(p, avg)<closest){
-			closest = distance(p,avg);
+			if(distance(p, med)<closest){
+			closest = distance(p,med);
 			temp = p;
 			}
 		}
 		middle = temp;
 		return middle;
+		
 	}
 
 	cluster(Point p){
@@ -133,15 +167,8 @@ void load(string fname, vector<Point> &points){
 
 
 
-bool xComp(const Point & a, const Point& b) {
-   return a.x < b.x;
-}
-bool yComp(const Point & a, const Point& b) {
-   return a.y < b.y;
-}
-bool zComp(const Point & a, const Point& b) {
-   return a.z < b.z;
-}
+
+
 
 void split(int rangedavg, int dim, vector<Point>& initial, vector<Point> &split){
 	int c=1;
@@ -198,20 +225,42 @@ int verify(vector<vector<Point>> sectors){
 	return maxDist;
 }
 
-void sortbins( vector<Point> &points,int dir){
-	
-	if(dir== 0){
-		sort(points.begin(),points.end(),&xComp);
-	}
-	if(dir== 1){
-		sort(points.begin(),points.end(),&yComp);
-	}
-	if(dir== 2){
-		sort(points.begin(),points.end(),&zComp);
-	}
+bool compareWeight(const pair<int, Point> &a, const pair<int, Point> &b){
+	return a.first<b.first;
 }
 
-
+void weightedDistribution(vector<cluster>& clust, vector<Point> p, int i){
+       	clust.push_back(p.at(i));
+	vector<pair<int,Point>> weight;
+	
+	while(clust.size()<k){
+		int fullweight = 0;
+		for(Point pnt: p){
+			int dist = 6001;
+			for(cluster c : clust){
+				if(dist>c.compareMid(pnt)){
+					dist = c.compareMid(pnt);
+				}
+			}
+			dist = dist*dist;
+			//fullweight += dist;
+			weight.push_back(pair<int,Point>(dist, pnt));
+		}
+		//int upper = rand() % fullweight;
+		//for(auto it = weight.begin(); it!=weight.end();it++){
+			//if(it->first>upper){
+			//	clust.push_back(it->second);
+				//coutit->second.toString()<<endl;
+			//	break;
+			//}
+			//upper -= it->first;
+		//}
+		sort(weight.begin(), weight.end(),&compareWeight);
+		clust.push_back(weight.at(0).second);
+		weight.clear();
+	}	
+	
+}
 vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 	vector<vector<Point>> sectors;
 	sectors.push_back(p);
@@ -253,31 +302,20 @@ void print(vector<cluster> clusters, int dist, string filename){
    f.close();
 }
 
-vector<cluster> createClusters(vector<Point> p){
+vector<cluster> createClusters(vector<Point> p, int sel){
 	srand(time(0));
-	//create inital nodes
-	vector<Point> set;
-	while(set.size()<k){
-		Point temp = p.at(rand()%p.size());
-		bool flag = false;
-		for(Point pnt: set){
-		if(pnt.equals(temp)) {
-			flag = true;
-			break;
-		}
-		}
-		if(flag) continue;
-
-		set.push_back(temp);
-	}
 	vector<cluster> clusters;
-	int base = rand();
+/*	
 	for(Point pnt : set){
 		clusters.push_back(cluster(pnt));//creates k clusters
 	}
+	*/
+	weightedDistribution(clusters, p, sel);
+	//cout"OUT CLUSTER"<<endl;
 	int clusterchange = 1;
 	int counter = 0;
 	while(clusterchange>0){
+		//coutcounter<<endl;
 		clusterchange = 0;//clusterchange set to one
 		for(int i = 0; i<p.size(); i++){ //groups point to nearest centroid 
 			int smallestdist = 6001;
@@ -289,14 +327,20 @@ vector<cluster> createClusters(vector<Point> p){
 					closestcluster = j;
 				}
 			}
+			//cout"HERE 1"<<endl;
+			//coutclosestcluster<<endl;
+			//couti<<endl;
+			//coutclusters.at(closestcluster).middle.toString()<<endl;
 			clusters.at(closestcluster).points.push_back(p.at(i));	// for each point, add it to closest cluster		
 		}
-		for(Point p: clusters.at(0).points){
-		}
+		
+			//cout"HERE 2"<<endl;
+		
 		for(int i = 0; i<k; i++){
 			Point temp = clusters.at(i).middle;
 			if(!temp.equals(clusters.at(i).findMiddle())) clusterchange++; //if the centroid changed, add to cluster change
 		}
+			//cout"HERE 3"<<endl;
 		//if there was a change in the middle (new points added), delete the vector of points
 		if(clusterchange != 0){
 			for(auto it= clusters.begin(); it!= clusters.end(); it++){
@@ -304,7 +348,7 @@ vector<cluster> createClusters(vector<Point> p){
 			}
 			
 		}
-		
+	counter++;	
 	}
 return clusters;
 }
@@ -328,18 +372,21 @@ int main(int argc, char* argv[]){
         for( string filename : filenames){
 		vector<Point> points;
 		load(filename,points);//load the points up
-		cout<<"FILE: "<<filename<<endl;
-		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
+		//cout"FILE: "<<filename<<endl;
+		//cout"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 		vector<cluster> bestcluster;
 		int smallestdist =6001;
-		cout<<"Looking to beat: "<<thresh<<endl;
+		//cout"Looking to beat: "<<thresh<<endl;
 		while(smallestdist>thresh){
-		vector<cluster> clusters = createClusters(points);
+			for(int i =0; i<n; i++){
+		vector<cluster> clusters = createClusters(points,i);
 		int dist = verify(clusters);
 		if(dist<smallestdist){
 			smallestdist = dist;
 			bestcluster = clusters;
+			break;
 		}
+			}
 		}
 		print(bestcluster,smallestdist,filename);
 	}

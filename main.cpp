@@ -5,6 +5,7 @@
 #include<algorithm>
 #include<cmath>
 #include <iostream>
+#include<ctime>
 using namespace std;
 
 int n,k;//global Variables
@@ -141,7 +142,8 @@ void sortbins( vector<Point> &points,int dir){
 }
 
 
-vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
+vector<vector<Point>> binmerge(vector<Point> p){
+	srand(time(0));
 	vector<vector<Point>> sectors;
 	sectors.push_back(p);
 	int largestSector=0;
@@ -150,7 +152,7 @@ vector<vector<Point>> binmerge(vector<Point> p,int start, int mult){
 		for(int j=0; j<sectors.size(); j++){
 			if(sectors.at(j).size()>sectors.at(largestSector).size()) largestSector = j;
 		}
-		int dim = (start+mult*i)%3;
+		int dim = (rand())%3;
 		sortbins(sectors.at(largestSector), dim);
 		vector<Point> temp;
 		int avg = (sectors.at(largestSector).front().get(dim)+sectors.at(largestSector).back().get(dim))/2; // get the range avg for dim
@@ -185,15 +187,18 @@ void print(vector<vector<Point>> points, int dist,string filename){
 
 
 int main(int argc, char* argv[]){
-	vector<string> filenames;
-	if(argc>1){
-		for(int i=1; i<argc; i++){
-			filenames.push_back(argv[i]);
-		}
-	}
-	else{//defualt input
-       	filenames.push_back("Input.txt");
-	}
+	vector<string> filenames; 
+        int thresh; 
+        if(argc>1){ 
+                thresh = stoi(argv[1]); 
+                for(int i=2; i<argc; i++){ 
+                        filenames.push_back(argv[i]); 
+                } 
+        } 
+        else{//defualt input 
+        filenames.push_back("Input.txt"); 
+        thresh = 2000; 
+        }
 	
 	for( string filename : filenames){
 		cout<<"Working with: "<<filename<<endl;
@@ -202,15 +207,14 @@ int main(int argc, char* argv[]){
 		cout<<"SIZE IS: " << points.size() <<" First Val: "<<points[0].toString()<<endl;
 		vector<vector<Point>> bestbin;
 		int smalldist = 6001;
-		for(int i = 0; i<3; i++){
-			for(int j = 1; j<3;j++){
-				vector<vector<Point>> bins = binmerge(points,i,j);
+		while(smalldist>thresh){
+				vector<vector<Point>> bins = binmerge(points);
 				int dist = verify(bins);
 				if(dist<smalldist){
 					smalldist = dist;
 					bestbin = bins;
 				}	
-			}
+			
 		}
 	
 	
